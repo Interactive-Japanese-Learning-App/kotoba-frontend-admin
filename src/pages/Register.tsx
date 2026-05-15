@@ -9,9 +9,9 @@ function Register() {
       <div className="flex flex-col items-center mb-10">
 
         <img
-        src={logo}
-        alt="KOTOBA Logo"
-        className="w-[130px]"
+          src={logo}
+          alt="KOTOBA Logo"
+          className="w-[130px]"
         />
 
         <h1 className="text-[#123b5d] text-[28px] font-bold mt-2 tracking-wide">
