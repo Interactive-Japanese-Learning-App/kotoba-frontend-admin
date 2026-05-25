@@ -1,14 +1,88 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import logo from "../assets/kotoba-logo.png";
 
-import AuthInput from "../components/AuthInput";
 import AuthButton from "../components/AuthButton";
 import AuthCard from "../components/AuthCard";
+
+import api from "../services/api";
 
 function Login() {
 
   const navigate = useNavigate();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  //
+  // HANDLE LOGIN
+  //
+  const handleLogin = async () => {
+
+    try {
+
+      if (!email || !password) {
+        alert(
+          "Email dan password wajib diisi"
+        );
+        return;
+      }
+
+      setLoading(true);
+
+      const response = await api.post(
+        "/auth/admin/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      //
+      // SAVE TOKEN
+      //
+      localStorage.setItem(
+        "token",
+        response.data.token
+      );
+
+      localStorage.setItem(
+        "admin",
+        JSON.stringify(
+          response.data.admin
+        )
+      );
+
+      alert("Login berhasil");
+
+      navigate("/dashboard");
+
+    } catch (error: any) {
+
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Login gagal"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
 
   return (
     <div
@@ -23,7 +97,7 @@ function Login() {
       "
     >
 
-      {/* Logo */}
+      {/* LOGO */}
       <div className="flex flex-col items-center mb-6">
 
         <img
@@ -46,56 +120,100 @@ function Login() {
 
       </div>
 
-      {/* Card */}
+      {/* CARD */}
       <AuthCard>
 
         <div className="flex flex-col gap-4">
 
-          <AuthInput
+          {/* EMAIL */}
+          <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="
+              h-[52px]
+              rounded-[8px]
+              border
+              border-[#d2d2d2]
+              bg-[#f7f7f9]
+              px-5
+              text-[16px]
+              outline-none
+              focus:border-[#264d6d]
+            "
           />
 
-          <AuthInput
-            type="password"
-            placeholder="Kata Sandi"
-          />
+          {/* PASSWORD */}
+          <div className="relative">
 
-          <div className="flex justify-end -mt-1">
-
-            <a
-              href="#"
+            <input
+              type={
+                showPassword
+                  ? "text"
+                  : "password"
+              }
+              placeholder="Kata Sandi"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               className="
-                text-[13px]
+                w-full
+                h-[52px]
+                rounded-[8px]
+                border
+                border-[#d2d2d2]
+                bg-[#f7f7f9]
+                px-5
+                pr-12
+                text-[16px]
+                outline-none
+                focus:border-[#264d6d]
+              "
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword(
+                  !showPassword
+                )
+              }
+              className="
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
                 text-[#6f8aa5]
               "
             >
-              Lupa password?
-            </a>
+              {showPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
 
           </div>
 
+          {/* BUTTON */}
           <AuthButton
-            text="Masuk"
-            onClick={() => navigate("/dashboard")}
+            text={
+              loading
+                ? "Loading..."
+                : "Masuk"
+            }
+            onClick={handleLogin}
           />
 
         </div>
 
       </AuthCard>
 
-      {/* Google */}
-      <div className="mt-6">
-
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-          alt="Google"
-          className="w-[36px]"
-        />
-
-      </div>
-
-      {/* Bottom */}
+      {/* BOTTOM */}
       <p className="mt-5 text-[#666] text-[14px]">
 
         Belum punya akun?

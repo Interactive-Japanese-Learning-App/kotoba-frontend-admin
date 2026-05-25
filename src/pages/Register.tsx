@@ -1,34 +1,167 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+
 import logo from "../assets/kotoba-logo.png";
 
-function Register() {
-  return (
-    <div className="min-h-screen bg-[#f3f3f5] flex flex-col items-center justify-center">
+import AuthButton from "../components/AuthButton";
+import AuthCard from "../components/AuthCard";
 
-      {/* Logo */}
-      <div className="flex flex-col items-center mb-10">
+import api from "../services/api";
+
+function Register() {
+
+  const navigate = useNavigate();
+
+  //
+  // FORM
+  //
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [
+    confirmPassword,
+    setConfirmPassword,
+  ] = useState("");
+
+  //
+  // UI
+  //
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [
+    showConfirmPassword,
+    setShowConfirmPassword,
+  ] = useState(false);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  //
+  // HANDLE REGISTER
+  //
+  const handleRegister = async () => {
+
+    try {
+
+      //
+      // VALIDATION
+      //
+      if (
+        !email ||
+        !password ||
+        !confirmPassword
+      ) {
+        alert(
+          "Semua field wajib diisi"
+        );
+        return;
+      }
+
+      //
+      // PASSWORD MATCH
+      //
+      if (
+        password !== confirmPassword
+      ) {
+        alert(
+          "Password tidak sama"
+        );
+        return;
+      }
+
+      setLoading(true);
+
+      //
+      // API REQUEST
+      //
+      await api.post(
+        "/auth/admin/register",
+        {
+          email,
+          password,
+          confirmPassword,
+        }
+      );
+
+      alert(
+        "Register berhasil"
+      );
+
+      //
+      // REDIRECT LOGIN
+      //
+      navigate("/");
+
+    } catch (error: any) {
+
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Register gagal"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
+
+  return (
+    <div
+      className="
+        min-h-screen
+        bg-[#f3f3f5]
+        flex
+        flex-col
+        items-center
+        justify-center
+        px-4
+      "
+    >
+
+      {/* LOGO */}
+      <div className="flex flex-col items-center mb-6">
 
         <img
           src={logo}
           alt="KOTOBA Logo"
-          className="w-[130px]"
+          className="w-[90px]"
         />
 
-        <h1 className="text-[#123b5d] text-[28px] font-bold mt-2 tracking-wide">
+        <h1
+          className="
+            text-[#123b5d]
+            text-[24px]
+            font-bold
+            mt-1
+            tracking-wide
+          "
+        >
           KOTOBA
         </h1>
 
       </div>
 
-      {/* Card */}
-      <div className="bg-[#f7f7f9] w-[490px] rounded-[10px] px-16 py-14 shadow-sm">
+      {/* CARD */}
+      <AuthCard>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
 
-          {/* Email */}
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             className="
               h-[52px]
               rounded-[8px]
@@ -42,77 +175,140 @@ function Register() {
             "
           />
 
-          {/* Password */}
-          <input
-            type="password"
-            placeholder="Kata Sandi"
-            className="
-              h-[52px]
-              rounded-[8px]
-              border
-              border-[#d2d2d2]
-              bg-[#f7f7f9]
-              px-5
-              text-[16px]
-              outline-none
-              focus:border-[#264d6d]
-            "
-          />
+          {/* PASSWORD */}
+          <div className="relative">
 
-          {/* Confirm Password */}
-          <input
-            type="password"
-            placeholder="Konfirmasi Kata Sandi"
-            className="
-              h-[52px]
-              rounded-[8px]
-              border
-              border-[#d2d2d2]
-              bg-[#f7f7f9]
-              px-5
-              text-[16px]
-              outline-none
-              focus:border-[#264d6d]
-            "
-          />
+            <input
+              type={
+                showPassword
+                  ? "text"
+                  : "password"
+              }
+              placeholder="Kata Sandi"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              className="
+                w-full
+                h-[52px]
+                rounded-[8px]
+                border
+                border-[#d2d2d2]
+                bg-[#f7f7f9]
+                px-5
+                pr-12
+                text-[16px]
+                outline-none
+                focus:border-[#264d6d]
+              "
+            />
 
-          {/* Button */}
-          <button
-            className="
-              h-[52px]
-              rounded-[8px]
-              bg-[#264d6d]
-              text-white
-              font-bold
-              text-[16px]
-              mt-1
-            "
-          >
-            Daftar
-          </button>
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword(
+                  !showPassword
+                )
+              }
+              className="
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
+                text-[#6f8aa5]
+              "
+            >
+              {showPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+
+          </div>
+
+          {/* CONFIRM PASSWORD */}
+          <div className="relative">
+
+            <input
+              type={
+                showConfirmPassword
+                  ? "text"
+                  : "password"
+              }
+              placeholder="Konfirmasi Kata Sandi"
+              value={confirmPassword}
+              onChange={(e) =>
+                setConfirmPassword(
+                  e.target.value
+                )
+              }
+              className="
+                w-full
+                h-[52px]
+                rounded-[8px]
+                border
+                border-[#d2d2d2]
+                bg-[#f7f7f9]
+                px-5
+                pr-12
+                text-[16px]
+                outline-none
+                focus:border-[#264d6d]
+              "
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowConfirmPassword(
+                  !showConfirmPassword
+                )
+              }
+              className="
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
+                text-[#6f8aa5]
+              "
+            >
+              {showConfirmPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+
+          </div>
+
+          {/* BUTTON */}
+          <AuthButton
+            text={
+              loading
+                ? "Loading..."
+                : "Daftar"
+            }
+            onClick={handleRegister}
+          />
 
         </div>
 
-      </div>
+      </AuthCard>
 
-      {/* Google */}
-      <div className="mt-12">
-
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-          width="42"
-        />
-
-      </div>
-
-      {/* Bottom Text */}
-      <p className="mt-10 text-[#666] text-[15px]">
+      {/* BOTTOM */}
+      <p className="mt-5 text-[#666] text-[14px]">
 
         Sudah punya akun?
 
         <Link
           to="/"
-          className="text-[#b31e23] font-semibold ml-1"
+          className="
+            text-[#b31e23]
+            font-semibold
+            ml-1
+          "
         >
           Masuk
         </Link>

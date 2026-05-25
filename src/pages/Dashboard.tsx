@@ -1,145 +1,157 @@
+import { useEffect, useState } from "react";
+
 import AdminLayout from "../layouts/AdminLayout";
 import StatCard from "../components/StatCard";
 
-import { Users, BookOpen, Image } from "lucide-react";
-
 import {
-    ResponsiveContainer,
-    AreaChart,
-    Area,
-    XAxis,
-    Tooltip,
-    BarChart,
-    Bar,
-    LineChart,
-    Line,
-} from "recharts";
+  Users,
+  Shield,
+} from "lucide-react";
 
-const userData = [
-    { day: "Sen", users: 120 },
-    { day: "Sel", users: 210 },
-    { day: "Rab", users: 180 },
-    { day: "Kam", users: 320 },
-    { day: "Jum", users: 280 },
-    { day: "Sab", users: 390 },
-    { day: "Min", users: 340 },
-];
+import api from "../services/api";
 
-const channelData = [
-    { day: "Sen", total: 12 },
-    { day: "Sel", total: 18 },
-    { day: "Rab", total: 15 },
-    { day: "Kam", total: 25 },
-    { day: "Jum", total: 20 },
-    { day: "Sab", total: 28 },
-    { day: "Min", total: 24 },
-];
-
-const videoData = [
-    { day: "Sen", views: 40 },
-    { day: "Sel", views: 55 },
-    { day: "Rab", views: 70 },
-    { day: "Kam", views: 60 },
-    { day: "Jum", views: 90 },
-    { day: "Sab", views: 120 },
-    { day: "Min", views: 100 },
-];
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
-    return (
-        <AdminLayout>
 
-            <div className="page-container">
+  const navigate = useNavigate();
 
-                {/* HEADER */}
-                <div>
-                    <h1 className="page-title">Selamat Datang, Admin</h1>
-                    <p className="page-subtitle">
-                        Ringkasan statistik platform Kotoba hari ini.
-                    </p>
-                </div>
+  const [
+    totalAccounts,
+    setTotalAccounts,
+  ] = useState(0);
 
-                {/* STATS */}
-                <div className="stats-grid-3">
+  const [
+    totalAdmins,
+    setTotalAdmins,
+  ] = useState(0);
 
-                    <StatCard
-                        title="Total Pengguna"
-                        value="12,482"
-                        subtitle="Pengguna aktif"
-                        icon={<Users size={22} />}
-                        iconBg="#eaf4fb"
-                        iconColor="#264d6d"
-                    />
+  const [loading, setLoading] =
+    useState(true);
 
-                    <StatCard
-                        title="Konten Belajar"
-                        value="324"
-                        subtitle="Materi tersedia"
-                        icon={<BookOpen size={22} />}
-                        iconBg="#fff7da"
-                        iconColor="#edbc1d"
-                    />
+  //
+  // FETCH DATA
+  //
+  const fetchAccounts = async () => {
 
-                    <StatCard
-                        title="Media Upload"
-                        value="1,203"
-                        subtitle="Total media"
-                        icon={<Image size={22} />}
-                        iconBg="#fde8e8"
-                        iconColor="#b31e23"
-                    />
+    try {
 
-                </div>
+      const response =
+        await api.get(
+          "/account/accounts"
+        );
 
-                {/* CHART 1 */}
-                <div className="card p-5">
-                    <h2 className="card-title">Grafik User</h2>
-                    <p className="card-subtitle">Statistik pengguna aktif mingguan</p>
+      const accounts =
+        response.data.accounts;
 
-                    <div className="h-[280px] mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={userData}>
-                                <XAxis dataKey="day" />
-                                <Tooltip />
-                                <Area dataKey="users" stroke="#264d6d" fill="#dbe8f1" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+      setTotalAccounts(
+        response.data.total
+      );
 
-                {/* CHART 2-3 */}
-                <div className="grid grid-cols-2 gap-4">
+      setTotalAdmins(
+        accounts.filter(
+          (a: any) =>
+            a.role === "admin"
+        ).length
+      );
 
-                    <div className="card p-5">
-                        <h2 className="card-title">Grafik Channel</h2>
+    } catch (error: any) {
 
-                        <ResponsiveContainer width="100%" height={220}>
-                            <BarChart data={channelData}>
-                                <XAxis dataKey="day" />
-                                <Tooltip />
-                                <Bar dataKey="total" fill="#edbc1d" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+      console.log(error);
 
-                    <div className="card p-5">
-                        <h2 className="card-title">Grafik Video</h2>
+      if (
+        error.response?.status === 401 ||
+        error.response?.status === 403
+      ) {
 
-                        <ResponsiveContainer width="100%" height={220}>
-                            <LineChart data={videoData}>
-                                <XAxis dataKey="day" />
-                                <Tooltip />
-                                <Line dataKey="views" stroke="#b31e23" />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
+        localStorage.removeItem(
+          "token"
+        );
 
-                </div>
+        navigate("/");
+      }
 
-            </div>
+    } finally {
 
-        </AdminLayout>
-    );
+      setLoading(false);
+
+    }
+  };
+
+  //
+  // CHECK LOGIN
+  //
+  useEffect(() => {
+
+    const token =
+      localStorage.getItem(
+        "token"
+      );
+
+    if (!token) {
+
+      navigate("/");
+
+      return;
+    }
+
+    fetchAccounts();
+
+  }, []);
+
+  return (
+    <AdminLayout>
+
+      <div className="page-container">
+
+        {/* HEADER */}
+        <div>
+
+          <h1 className="page-title">
+            Dashboard Admin
+          </h1>
+
+          <p className="page-subtitle">
+            Ringkasan data pengguna
+          </p>
+
+        </div>
+
+        {/* STATS */}
+        <div className="stats-grid-3">
+
+          <StatCard
+            title="Total Akun"
+            value={
+              loading
+                ? "Loading..."
+                : totalAccounts
+            }
+            subtitle="Semua pengguna"
+            icon={<Users size={22} />}
+            iconBg="#eaf4fb"
+            iconColor="#264d6d"
+          />
+
+          <StatCard
+            title="Total Admin"
+            value={
+              loading
+                ? "Loading..."
+                : totalAdmins
+            }
+            subtitle="Administrator"
+            icon={<Shield size={22} />}
+            iconBg="#fff1f1"
+            iconColor="#b31e23"
+          />
+
+        </div>
+
+      </div>
+
+    </AdminLayout>
+  );
 }
 
 export default Dashboard;
