@@ -1,479 +1,141 @@
 import { useEffect, useState } from "react";
-
 import AdminLayout from "../layouts/AdminLayout";
-
-import {
-  Shield,
-  Trash2,
-  Users as UsersIcon,
-} from "lucide-react";
-
+import { Shield, Trash2, Users as UsersIcon, ChevronDown, User } from "lucide-react";
 import api from "../services/api";
-
 import { useNavigate } from "react-router-dom";
 
 function Users() {
-
   const navigate = useNavigate();
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  const [accounts, setAccounts] =
-    useState<any[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  //
-  // FETCH ACCOUNTS
-  //
   const fetchAccounts = async () => {
-
     try {
-
-      const response =
-        await api.get(
-          "/account/accounts"
-        );
-
-      setAccounts(
-        response.data.accounts
-      );
-
+      setLoading(true);
+      const response = await api.get("/account/accounts");
+      setAccounts(response.data.accounts || []);
     } catch (error: any) {
-
-      console.log(error);
-
-      if (
-        error.response?.status === 401 ||
-        error.response?.status === 403
-      ) {
-
-        localStorage.removeItem(
-          "token"
-        );
-
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem("token");
         navigate("/");
       }
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
-  //
-  // DELETE ACCOUNT
-  //
-  const handleDelete = async (
-    id: string
-  ) => {
-
-    const confirmDelete =
-      window.confirm(
-        "Yakin ingin menghapus akun?"
-      );
-
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm("Yakin ingin menghapus akun ini?");
     if (!confirmDelete) return;
-
     try {
-
-      await api.delete(
-        `/account/accounts/${id}`
-      );
-
+      await api.delete(`/account/accounts/${id}`);
       fetchAccounts();
-
     } catch (error: any) {
-
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Gagal menghapus akun"
-      );
-
+      alert(error.response?.data?.message || "Gagal menghapus akun");
     }
   };
 
-  //
-  // CHANGE ROLE
-  //
-  const handleChangeRole = async (
-    account: any,
-    newRole: string
-  ) => {
-
+  const handleChangeRole = async (account: any, newRole: string) => {
+    setActiveDropdown(null);
+    if (account.role === newRole) return;
     try {
-
-      if (
-        account.role === newRole
-      ) {
-        return;
-      }
-
-      await api.patch(
-        `/account/accounts/${account._id}/role`,
-        {
-          role: newRole,
-        }
-      );
-
+      await api.patch(`/account/accounts/${account._id}/role`, { role: newRole });
       fetchAccounts();
-
     } catch (error: any) {
-
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Gagal mengubah role"
-      );
-
+      alert(error.response?.data?.message || "Gagal mengubah role");
     }
   };
 
-  //
-  // CHECK LOGIN
-  //
   useEffect(() => {
-
-    const token =
-      localStorage.getItem(
-        "token"
-      );
-
-    if (!token) {
-
-      navigate("/");
-      return;
-    }
-
+    const token = localStorage.getItem("token");
+    if (!token) { navigate("/"); return; }
     fetchAccounts();
-
   }, []);
 
   return (
     <AdminLayout>
-
-      <div className="page-container">
-
+      <div className="w-full p-6 flex flex-col gap-6">
+        
         {/* HEADER */}
         <div>
-
-          <h1 className="page-title">
-            Pengguna
-          </h1>
-
-          <p className="page-subtitle">
-            Kelola semua akun
-          </p>
-
+          <h1 className="text-2xl font-bold text-[#264d6d] tracking-tight">Pengguna</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Kelola akses dan data seluruh akun pengguna</p>
         </div>
 
-        {/* STATS */}
-        <div className="stats-grid-3">
-
-          {/* TOTAL */}
-          <div className="stats-card">
-
+        {/* STATS CARD */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-
-              <p className="text-muted">
-                Total Akun
-              </p>
-
-              <h2
-                className="
-                  text-[24px]
-                  font-bold
-                  text-[#264d6d]
-                  mt-1
-                "
-              >
-                {accounts.length}
-              </h2>
-
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Akun</p>
+              <h3 className="text-2xl font-bold text-[#264d6d] mt-1">{loading ? "..." : accounts.length}</h3>
             </div>
-
-            <div
-              className="
-                icon-box
-                bg-[#eaf4fb]
-                text-[#264d6d]
-              "
-            >
-              <UsersIcon size={22} />
-            </div>
-
+            <div className="p-3 bg-[#eaf4fb] text-[#264d6d] rounded-xl"><UsersIcon size={20} /></div>
           </div>
-
-          {/* ADMIN */}
-          <div className="stats-card">
-
+          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-
-              <p className="text-muted">
-                Total Admin
-              </p>
-
-              <h2
-                className="
-                  text-[24px]
-                  font-bold
-                  text-[#b31e23]
-                  mt-1
-                "
-              >
-                {
-                  accounts.filter(
-                    (a) =>
-                      a.role === "admin"
-                  ).length
-                }
-              </h2>
-
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Admin</p>
+              <h3 className="text-2xl font-bold text-[#b31e23] mt-1">{loading ? "..." : accounts.filter((a) => a.role === "admin").length}</h3>
             </div>
-
-            <div
-              className="
-                icon-box
-                bg-[#fff1f1]
-                text-[#b31e23]
-              "
-            >
-              <Shield size={22} />
-            </div>
-
+            <div className="p-3 bg-[#fff1f1] text-[#b31e23] rounded-xl"><Shield size={20} /></div>
           </div>
-
         </div>
 
-        {/* TABLE */}
-        <div className="card">
-
-          <div className="card-header">
-
-            <div>
-
-              <h2 className="card-title">
-                Semua Akun
-              </h2>
-
-              <p className="card-subtitle">
-                Total {accounts.length} akun
-              </p>
-
-            </div>
-
+        {/* TABLE SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900">Daftar Pengguna</h2>
           </div>
 
           <div className="overflow-x-auto">
-
-            <table className="w-full">
-
+            <table className="w-full text-left">
               <thead>
-
-                <tr className="bg-[#f9fafb]">
-
-                  <th className="table-head">
-                    Username
-                  </th>
-
-                  <th className="table-head">
-                    Email
-                  </th>
-
-                  <th className="table-head">
-                    Role
-                  </th>
-
-                  <th className="table-head">
-                    Created
-                  </th>
-
-                  <th className="table-head text-center">
-                    Aksi
-                  </th>
-
+                <tr className="bg-gray-50/50">
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500">Username</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500">Email</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500">Role</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500">Bergabung</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500 text-center">Aksi</th>
                 </tr>
-
               </thead>
-
-              <tbody>
-
-                {loading ? (
-
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="
-                        text-center
-                        py-10
-                      "
-                    >
-                      Loading...
-                    </td>
-                  </tr>
-
-                ) : accounts.length === 0 ? (
-
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="
-                        text-center
-                        py-10
-                      "
-                    >
-                      Tidak ada data
-                    </td>
-                  </tr>
-
-                ) : (
-
-                  accounts.map((account) => {
-
-                    const username =
-                      account.email.split("@")[0];
-
-                    return (
-
-                      <tr
-                        key={account._id}
-                        className="
-                          table-row
-                          hover:bg-[#f8fafc]
-                        "
-                      >
-
-                        {/* USERNAME */}
-                        <td className="table-cell">
-
-                          <div
-                            className="
-                              flex
-                              items-center
-                              gap-3
-                            "
-                          >
-
-                            <div
-                              className="
-                                icon-box
-                                bg-[#eef3f7]
-                                text-[#264d6d]
-                                font-bold
-                              "
-                            >
-                              {username
-                                .charAt(0)
-                                .toUpperCase()}
-                            </div>
-
-                            <p
-                              className="
-                                font-semibold
-                                text-[14px]
-                              "
-                            >
-                              {username}
-                            </p>
-
-                          </div>
-
-                        </td>
-
-                        {/* EMAIL */}
-                        <td className="table-cell">
-                          {account.email}
-                        </td>
-
-                        {/* ROLE */}
-                        <td className="table-cell">
-
-                          <select
-                            value={account.role}
-                            onChange={(e) =>
-                              handleChangeRole(
-                                account,
-                                e.target.value
-                              )
-                            }
-                            className="
-                              border
-                              rounded-lg
-                              px-2
-                              py-1
-                            "
-                          >
-                            <option value="user">
-                              USER
-                            </option>
-
-                            <option value="admin">
-                              ADMIN
-                            </option>
-
-                          </select>
-
-                        </td>
-
-                        {/* DATE */}
-                        <td
-                          className="
-                            table-cell
-                            text-muted
-                          "
+              <tbody className="divide-y divide-gray-100">
+                {loading ? [...Array(3)].map((_, i) => (
+                  <tr key={i} className="animate-pulse"><td colSpan={5} className="p-8"><div className="h-4 bg-gray-100 rounded-full" /></td></tr>
+                )) : accounts.map((account) => {
+                  const isAdmin = account.role === "admin";
+                  return (
+                    <tr key={account._id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-4 font-bold text-gray-700 capitalize text-sm">{account.email.split("@")[0]}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{account.email}</td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => setActiveDropdown(activeDropdown === account._id ? null : account._id)}
+                          className={`px-3 py-1 rounded-full text-[11px] font-bold border ${isAdmin ? "bg-[#fff1f1] text-[#b31e23] border-red-100" : "bg-[#eaf4fb] text-[#264d6d] border-blue-100"} flex items-center gap-1.5`}
                         >
-                          {new Date(
-                            account.createdAt
-                          ).toLocaleDateString()}
-                        </td>
-
-                        {/* ACTION */}
-                        <td className="table-cell">
-
-                          <div
-                            className="
-                              flex
-                              justify-center
-                            "
-                          >
-
-                            <button
-                              onClick={() =>
-                                handleDelete(
-                                  account._id
-                                )
-                              }
-                              className="
-                                btn-secondary
-                                hover:bg-red-50
-                                text-red-500
-                              "
-                            >
-                              <Trash2 size={14} />
-                            </button>
-
+                          {isAdmin ? <Shield size={12} /> : <User size={12} />} {account.role.toUpperCase()}
+                        </button>
+                        {/* Dropdown Role */}
+                        {activeDropdown === account._id && (
+                          <div className="absolute mt-2 w-28 bg-white border border-gray-100 rounded-xl shadow-xl z-20 overflow-hidden py-1">
+                            <button onClick={() => handleChangeRole(account, "user")} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-600 hover:bg-gray-50">USER</button>
+                            <button onClick={() => handleChangeRole(account, "admin")} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-600 hover:bg-gray-50">ADMIN</button>
                           </div>
-
-                        </td>
-
-                      </tr>
-                    );
-                  })
-                )}
-
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-400">{new Date(account.createdAt).toLocaleDateString("id-ID")}</td>
+                      <td className="px-6 py-4 text-center">
+                        <button onClick={() => handleDelete(account._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
-
             </table>
-
           </div>
-
         </div>
-
       </div>
-
     </AdminLayout>
   );
 }
