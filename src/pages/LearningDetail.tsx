@@ -133,7 +133,7 @@ function LearningDetail() {
         await api.put(`/nihongo/${categoryKey}/${selectedId}`, payload);
       }
       setIsModalOpen(false);
-      fetchData();
+      await fetchData();
     } catch (error) {
       console.error("Gagal melakukan sinkronisasi modifikasi data:", error);
     }
@@ -310,8 +310,8 @@ function LearningDetail() {
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
                   className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === 1
-                      ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
-                      : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                    ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
+                    : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
                 >
                   <ChevronLeft size={16} />
@@ -326,8 +326,8 @@ function LearningDetail() {
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
                         className={`w-9 h-9 text-sm font-medium rounded-xl transition-colors ${currentPage === pageNum
-                            ? "bg-[#123b5d] text-white"
-                            : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+                          ? "bg-[#123b5d] text-white"
+                          : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
                           }`}
                       >
                         {pageNum}
@@ -343,8 +343,8 @@ function LearningDetail() {
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === totalPages
-                      ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
-                      : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                    ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
+                    : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
                 >
                   Next
