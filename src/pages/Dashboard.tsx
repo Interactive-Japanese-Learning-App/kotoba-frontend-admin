@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import { Users, Shield, BookOpen, Layers } from "lucide-react";
 import api from "../services/api";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 
 function Dashboard() {
-  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalAccounts: 0,
     totalAdmins: 0,

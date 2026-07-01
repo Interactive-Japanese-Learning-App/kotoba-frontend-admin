@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../layouts/AdminLayout";
-import { Shield, Trash2, Users as UsersIcon, ChevronDown, User } from "lucide-react";
+import { Shield, Trash2, Users as UsersIcon, User } from "lucide-react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -122,11 +122,6 @@ function Users() {
                           >
                             {isAdmin ? <Shield size={12} /> : <User size={12} />}
                             {account.role.toUpperCase()}
-                            <ChevronDown
-                              size={12}
-                              className={`transition-transform ${activeDropdown === account._id ? "rotate-180" : ""
-                                }`}
-                            />
                           </button>
 
                           {activeDropdown === account._id && (
