@@ -4,8 +4,8 @@ import {
   BookOpen,
   Image,
   LogOut,
+  User, // Tambahkan ini
 } from "lucide-react";
-
 import {
   Link,
   useLocation,
@@ -242,52 +242,54 @@ function Sidebar() {
             gap-3
             border
             border-[#eeeeee]
+            align-middle
           "
         >
+{/* AVATAR */}
+<div
+  className="
+    w-11
+    h-11
+    min-w-[44px]   // Tambahkan ini untuk mencegah container menyusut
+    min-h-[44px]   // Tambahkan ini untuk mencegah container menyusut
+    rounded-full
+    bg-[#123b5d]
+    text-white
+    flex
+    items-center
+    justify-center
+    font-bold
+    text-[18px]
+    overflow-hidden // Pastikan ikon tidak keluar dari batas lingkaran
+  "
+>
+  <User size={22} className="flex-shrink-0" /> {/* Tambahkan flex-shrink-0 */}
+</div>
+          {/* INFO - Gunakan class ini */}
+<div className="flex-1 min-w-0"> {/* min-w-0 sangat penting agar teks bisa di-truncate dengan benar */}
+  <h2
+    className="
+      text-[13px]
+      font-bold
+      text-slate-800
+      truncate
+      leading-tight
+    "
+  >
+    {username.toLowerCase()}
+  </h2>
 
-          {/* AVATAR */}
-          <div
-            className="
-              w-11
-              h-11
-              rounded-full
-              bg-[#123b5d]
-              text-white
-              flex
-              items-center
-              justify-center
-              font-bold
-              text-[18px]
-            "
-          >
-            {username.charAt(0).toUpperCase()}
-          </div>
-
-          {/* INFO */}
-          <div>
-
-            <h2
-              className="
-                text-[14px]
-                font-semibold
-                text-[#111827]
-              "
-            >
-              {username}
-            </h2>
-
-            <p
-              className="
-                text-[12px]
-                text-gray-400
-              "
-            >
-              {admin?.email || "-"}
-            </p>
-
-          </div>
-
-        </div>
+  <p
+    className="
+      text-[11px]
+      text-slate-500
+      truncate
+      leading-tight
+    "
+  >
+    {(admin?.email || "-").toLowerCase()}
+  </p>
+</div>        </div>
 
         {/* LOGOUT */}
         <button
