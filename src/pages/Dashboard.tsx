@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../layouts/AdminLayout";
 import { Users, Shield, BookOpen, Layers, Video, Tv } from "lucide-react";
 import api from "../services/api";
-import { 
-  ResponsiveContainer, 
-  ComposedChart,
-  Bar, 
-  Line,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   Legend,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  AreaChart, 
+  AreaChart,
   Area,
-  LabelList
+  LabelList,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 function Dashboard() {
@@ -64,7 +64,7 @@ function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       const userRes = await api.get("/account/accounts").catch(() => ({ data: { accounts: [] } }));
       const accounts = userRes.data.accounts || [];
 
@@ -82,7 +82,7 @@ function Dashboard() {
           return { name: model.replace("Model", ""), count: Array.isArray(dataArr) ? dataArr.length : 0 };
         })
       );
-      const chartData = results.filter((r): r is PromiseFulfilledResult<{name: string, count: number}> => r.status === 'fulfilled').map(r => r.value);
+      const chartData = results.filter((r): r is PromiseFulfilledResult<{ name: string, count: number }> => r.status === 'fulfilled').map(r => r.value);
       const totalContent = chartData.reduce((acc, curr) => acc + curr.count, 0);
 
       const ytRes = await api.get("/youtube").catch(() => ({ data: { data: { videos: [], topChannels: [] } } }));
@@ -155,25 +155,25 @@ function Dashboard() {
       <svg className="hidden">
         <defs>
           <linearGradient id="colorUser" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#264d6d" stopOpacity={0.25}/>
-            <stop offset="95%" stopColor="#264d6d" stopOpacity={0}/>
+            <stop offset="5%" stopColor="#264d6d" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="#264d6d" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorBarVideo" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity={1}/>
-            <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.95}/>
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+            <stop offset="100%" stopColor="#1d4ed8" stopOpacity={0.95} />
           </linearGradient>
         </defs>
       </svg>
 
       <div className="w-full p-6 flex flex-col gap-8">
-        
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-4">
           <div>
             <h1 className="text-2xl font-bold text-[#264d6d] tracking-tight">Dashboard</h1>
             <p className="text-xs text-slate-400 mt-0.5">Metrik performa basis data platform dan analitik streaming terintegrasi.</p>
           </div>
-          
+
         </div>
 
         {/* STATS CARDS */}
@@ -186,7 +186,7 @@ function Dashboard() {
           ].map((item, i) => (
             <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer group">
               <div className="flex justify-between items-start mb-3">
-                <div className="p-2.5 rounded-xl transition-transform duration-300 group-hover:scale-110" style={{backgroundColor: item.bg, color: item.color}}><item.icon size={18} /></div>
+                <div className="p-2.5 rounded-xl transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: item.bg, color: item.color }}><item.icon size={18} /></div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-600">{item.title}</p>
               </div>
               <h3 className="text-2xl font-bold text-slate-800 tracking-tight">{item.val}</h3>
@@ -206,7 +206,7 @@ function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="name" fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dy={10} />
                   <YAxis fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dx={-5} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#0f172a', color: '#fff' }}
                     itemStyle={{ color: '#38bdf8' }}
                   />
@@ -260,91 +260,217 @@ function Dashboard() {
 
         {/* BARIS 2: YOUTUBE BIG DATA (2 KOLOM JELAS & PRESISI DATA) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* GRAFIK 2: COMPOSED CHART DENGAN VALUE LABELS DI ATAS BATANG */}
+
+          {/* GRAFIK 2: AREA CHART PERFORMA VIDEO (VIEWS & LIKES) */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Big Data - Video</h2>
-                <p className="text-[10px] text-slate-400 mt-0.5">💡 Top video berdasarkan performa (Views & Likes).</p>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Big Data - Video
+                </h2>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  💡 Top video berdasarkan performa (Views & Likes).
+                </p>
               </div>
+
               <span className="flex items-center gap-1 text-[9px] bg-transparent text-[#264d6d] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase">
                 <Video size={12} /> Big Data
               </span>
             </div>
+
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={stats.ytVideosData} margin={{ top: 20, right: 10, left: 10, bottom: 35 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
-                  <XAxis dataKey="title" fontSize={10} fontWeight={500} tickLine={false} axisLine={false} stroke="#475569" angle={-20} textAnchor="end" dy={12} height={45} />
+                <AreaChart
+                  data={stats.ytVideosData}
+                  margin={{
+                    top: 20,
+                    right: 25,
+                    left: 10,
+                    bottom: 40,
+                  }}
+                >
+                  {/* Gradient */}
+                  <defs>
+                    <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#264D6D" stopOpacity={0.45} />
+                      <stop offset="95%" stopColor="#264D6D" stopOpacity={0.05} />
+                    </linearGradient>
 
-                  <YAxis fontSize={10} fontWeight={500} tickLine={false} axisLine={false} stroke="#475569" tickFormatter={formatYAxis} />
+                    <linearGradient id="likesGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EDBC1D" stopOpacity={0.45} />
+                      <stop offset="95%" stopColor="#EDBC1D" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#cbd5e1"
+                  />
+
+                  <XAxis
+                    dataKey="title"
+                    angle={-20}
+                    textAnchor="end"
+                    height={55}
+                    dy={12}
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={10}
+                  />
+
+                  {/* YAxis Views */}
+                  <YAxis
+                    yAxisId="left"
+                    tickFormatter={formatYAxis}
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={10}
+                    stroke="#264D6D"
+                  />
+
+                  {/* YAxis Likes */}
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tickFormatter={formatYAxis}
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={10}
+                    stroke="#EDBC1D"
+                  />
 
                   <Tooltip
-                    cursor={{ fill: '#f1f5f9' }}
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                    formatter={(value, name) => {
+                      if (typeof value === "number") {
+                        return [value.toLocaleString("id-ID"), name];
+                      }
+
+                      return [String(value), name];
                     }}
                   />
-                  <Legend onClick={handleLegendClick} wrapperStyle={{ fontSize: '11px', paddingTop: '15px', cursor: 'pointer', fontWeight: 500 }} />
 
-                  {/* Views sebagai "bigdata" bar (dominant) */}
-                  <Bar
+                  <Legend
+                    onClick={handleLegendClick}
+                    wrapperStyle={{
+                      fontSize: "11px",
+                      paddingTop: "15px",
+                      cursor: "pointer",
+                      fontWeight: 500,
+                    }}
+                  />
+
+                  {/* Views */}
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
                     dataKey="Views"
                     hide={!showViews}
-                    fill="url(#colorBarVideo)"
-                    radius={[6, 6, 0, 0]}
-                    barSize={28}
-                    name="Views"
-                    animationDuration={1000}
-                  >
-                    <LabelList
-                      dataKey="Views"
-                      position="top"
-                      formatter={(v: any) => formatYAxis(v as any)}
-                      fontSize={9}
-                      fontWeight={700}
-                      fill="#1e4ed8"
-                      offset={6}
-                    />
-                  </Bar>
-
-                  {/* Likes sebagai garis untuk interaksi */}
-                  <Line
-                    type="monotone"
-                    hide={!showLikes}
-                    dataKey="Likes"
-                    stroke="#f59e0b"
+                    stroke="#264D6D"
                     strokeWidth={3}
-                    dot={{ r: 5, stroke: '#fff', strokeWidth: 2 }}
-                    activeDot={{ r: 7 }}
-                    name="Likes"
-                    animationDuration={1000}
+                    fill="url(#viewsGradient)"
+                    fillOpacity={1}
+                    activeDot={{ r: 6 }}
+                    name="Views"
                   />
-                </ComposedChart>
+
+                  {/* Likes */}
+                  <Area
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="Likes"
+                    hide={!showLikes}
+                    stroke="#EDBC1D"
+                    strokeWidth={3}
+                    fill="url(#likesGradient)"
+                    fillOpacity={1}
+                    activeDot={{ r: 6 }}
+                    name="Likes"
+                  />
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* GRAFIK 3: RADAR MAP CHANNELS DENGAN LABEL CLEAR */}
+          {/* GRAFIK 3: DONUT CHART CHANNEL TRENDING */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">Channel Trending</h2>
-              <span className="flex items-center gap-1 text-[9px] bg-transparent text-[#06b6d4] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase">
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Channel Trending
+                </h2>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  💡 Persentase total views berdasarkan channel.
+                </p>
+              </div>
+
+              <span className="flex items-center gap-1 text-[9px] bg-transparent text-[#264D6D] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase">
                 <Tv size={12} /> Big Data
               </span>
             </div>
-            <div className="h-72 w-full flex items-center justify-center">
+
+            <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" data={stats.ytChannelsData}>
-                  <PolarGrid stroke="#cbd5e1" />
-                  <PolarAngleAxis dataKey="channelName" tick={{ fontSize: 10, fill: '#334155', fontWeight: 600 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={{ fontSize: 9, fill: '#64748b' }} tickFormatter={(v: any) => formatYAxis(v)} />
-                  <Radar name="Total Views" dataKey="TotalViews" stroke="#06b6d4" fill="#22d3ee" fillOpacity={0.4} animationDuration={1000} />
-                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#0f172a', color: '#fff' }} />
-                </RadarChart>
+                <PieChart>
+                  <Pie
+                    data={stats.ytChannelsData}
+                    dataKey="TotalViews"
+                    nameKey="channelName"
+                    cx="50%"
+                    cy="45%"
+                    innerRadius={70}
+                    outerRadius={110}
+                    paddingAngle={2}
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  >
+                    {stats.ytChannelsData.map((_: any, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={[
+                          "#264D6D", // Biru
+                          "#B31E23", // Merah
+                          "#EDBC1D", // Kuning
+                          "#4CAF50", // Hijau
+                          "#686868", // Abu
+                        ][index % 5]}
+                      />
+                    ))}
+                  </Pie>
+
+                  <Tooltip
+                    formatter={(value) => Number(value).toLocaleString("id-ID")}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                    }}
+                  />
+
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    iconType="rect"
+                    wrapperStyle={{
+                      fontSize: "11px",
+                      paddingTop: "20px",
+                      lineHeight: "20px",
+                    }}
+                    formatter={(value) => (
+                      <span
+                        style={{
+                          display: "inline-block",
+                          maxWidth: "180px",
+                          whiteSpace: "normal",
+                          overflowWrap: "break-word",
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {value}
+                      </span>
+                    )}
+                  />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
