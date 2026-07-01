@@ -18,7 +18,7 @@ type NihongoItem = {
 function LearningDetail() {
   const { type } = useParams<{ type: string }>();
   const navigate = useNavigate();
-  
+
   // State manajemen data
   const [data, setData] = useState<NihongoItem[]>([]);
   const [filteredData, setFilteredData] = useState<NihongoItem[]>([]);
@@ -33,7 +33,7 @@ function LearningDetail() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
+
   // State elemen formulir data
   const [formCharacter, setFormCharacter] = useState("");
   const [formRomaji, setFormRomaji] = useState("");
@@ -79,13 +79,13 @@ function LearningDetail() {
 
   // Pemfilteran karakter berdasarkan input bar pencarian
   useEffect(() => {
-    const results = data.filter(item => 
+    const results = data.filter(item =>
       (item.character?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (item.romaji?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (item.meaning?.toLowerCase() || "").includes(searchTerm.toLowerCase())
     );
     setFilteredData(results);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, [searchTerm, data]);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ function LearningDetail() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const categoryKey = getBackendCategoryKey(type);
-    
+
     const payload = {
       character: formCharacter,
       romaji: formRomaji,
@@ -133,7 +133,7 @@ function LearningDetail() {
         await api.put(`/nihongo/${categoryKey}/${selectedId}`, payload);
       }
       setIsModalOpen(false);
-      fetchData(); 
+      fetchData();
     } catch (error) {
       console.error("Gagal melakukan sinkronisasi modifikasi data:", error);
     }
@@ -147,7 +147,7 @@ function LearningDetail() {
     const categoryKey = getBackendCategoryKey(type);
     try {
       await api.delete(`/nihongo/${categoryKey}/${id}`);
-      fetchData(); 
+      fetchData();
     } catch (error) {
       console.error("Gagal menghapus entri target:", error);
     }
@@ -162,7 +162,7 @@ function LearningDetail() {
   return (
     <AdminLayout>
       <div className="w-full p-6 flex flex-col gap-6">
-        
+
         {/* BREADCRUMB NAVIGATION */}
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span className="cursor-pointer hover:text-[#123b5d] transition-colors" onClick={() => navigate("/learning-content")}>
@@ -189,16 +189,16 @@ function LearningDetail() {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={handleOpenAddModal}
               className="h-10 px-4 text-sm font-medium text-white bg-[#123b5d] hover:bg-[#1c4c75] rounded-xl flex items-center gap-2 transition-colors shadow-sm"
             >
               <Plus size={16} />
               Tambah Kosakata
             </button>
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="h-10 px-4 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-colors"
             >
@@ -209,7 +209,7 @@ function LearningDetail() {
 
         {/* CONTAINER UTAMA TABEL */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-          
+
           {/* SEARCH & ROW FILTER BAR */}
           <div className="p-4 border-b border-gray-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
@@ -237,7 +237,7 @@ function LearningDetail() {
             </div>
           ) : currentItems.length === 0 ? (
             <div className="py-24 text-center text-sm text-gray-400 font-medium">
-               Tidak ada kecocokan data kosakata yang ditemukan.
+              Tidak ada kecocokan data kosakata yang ditemukan.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -248,7 +248,6 @@ function LearningDetail() {
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-40">Character</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-48">Romaji</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Meaning</th>
-                    <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center w-28">Type</th>
                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center w-28">Aksi</th>
                   </tr>
                 </thead>
@@ -305,16 +304,15 @@ function LearningDetail() {
               <span className="text-sm text-gray-500">
                 Halaman <span className="text-gray-900 font-medium">{currentPage}</span> dari <span className="text-gray-900 font-medium">{totalPages}</span>
               </span>
-              
+
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${
-                    currentPage === 1
+                  className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === 1
                       ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
                       : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   <ChevronLeft size={16} />
                   Prev
@@ -327,11 +325,10 @@ function LearningDetail() {
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-9 h-9 text-sm font-medium rounded-xl transition-colors ${
-                          currentPage === pageNum
+                        className={`w-9 h-9 text-sm font-medium rounded-xl transition-colors ${currentPage === pageNum
                             ? "bg-[#123b5d] text-white"
                             : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>
@@ -345,11 +342,10 @@ function LearningDetail() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${
-                    currentPage === totalPages
+                  className={`h-9 px-3 rounded-xl border text-sm font-medium transition-colors flex items-center gap-1 ${currentPage === totalPages
                       ? "bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed"
                       : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Next
                   <ChevronRight size={16} />
@@ -365,13 +361,13 @@ function LearningDetail() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-xs p-4">
           <div className="bg-white w-full max-w-md rounded-2xl border border-gray-200 shadow-xl overflow-hidden flex flex-col">
-            
+
             {/* Modal Header Title */}
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
               <h3 className="font-bold text-gray-900 tracking-tight">
                 {modalMode === "add" ? "Tambah Data Kosakata" : "Ubah Data Kosakata"}
               </h3>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
@@ -381,7 +377,7 @@ function LearningDetail() {
 
             {/* Modal Body Elements Content Form */}
             <form onSubmit={handleFormSubmit} className="p-6 flex flex-col gap-4">
-              
+
               {/* Field Character */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Character (Kanji / Kana)</label>
@@ -419,21 +415,6 @@ function LearningDetail() {
                   placeholder="Contoh: Bahasa Jepang"
                   className="w-full h-11 px-3.5 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 focus:outline-none focus:border-[#123b5d] focus:bg-white transition-all"
                 />
-              </div>
-
-              {/* Field Dropdown Category Select Type */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipe Klasifikasi</label>
-                <select
-                  value={formType}
-                  onChange={(e) => setFormType(e.target.value)}
-                  className="w-full h-11 px-3 border border-gray-200 rounded-xl text-sm text-gray-900 bg-gray-50 focus:outline-none focus:border-[#123b5d] focus:bg-white transition-all cursor-pointer"
-                >
-                  <option value="Basic">Basic</option>
-                  <option value="N5">JLPT N5</option>
-                  <option value="N4">JLPT N4</option>
-                  <option value="Additional">Additional</option>
-                </select>
               </div>
 
               {/* Modal Control Footer Action Trigger */}

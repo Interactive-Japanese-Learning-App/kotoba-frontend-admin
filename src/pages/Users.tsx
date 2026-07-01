@@ -56,7 +56,7 @@ function Users() {
   return (
     <AdminLayout>
       <div className="w-full p-6 flex flex-col gap-6">
-        
+
         {/* HEADER */}
         <div>
           <h1 className="text-2xl font-bold text-[#264d6d] tracking-tight">Pengguna</h1>
@@ -108,19 +108,45 @@ function Users() {
                       <td className="px-6 py-4 font-bold text-gray-700 capitalize text-sm">{account.email.split("@")[0]}</td>
                       <td className="px-6 py-4 text-sm text-gray-500">{account.email}</td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => setActiveDropdown(activeDropdown === account._id ? null : account._id)}
-                          className={`px-3 py-1 rounded-full text-[11px] font-bold border ${isAdmin ? "bg-[#fff1f1] text-[#b31e23] border-red-100" : "bg-[#eaf4fb] text-[#264d6d] border-blue-100"} flex items-center gap-1.5`}
-                        >
-                          {isAdmin ? <Shield size={12} /> : <User size={12} />} {account.role.toUpperCase()}
-                        </button>
-                        {/* Dropdown Role */}
-                        {activeDropdown === account._id && (
-                          <div className="absolute mt-2 w-28 bg-white border border-gray-100 rounded-xl shadow-xl z-20 overflow-hidden py-1">
-                            <button onClick={() => handleChangeRole(account, "user")} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-600 hover:bg-gray-50">USER</button>
-                            <button onClick={() => handleChangeRole(account, "admin")} className="w-full px-4 py-2 text-left text-xs font-bold text-gray-600 hover:bg-gray-50">ADMIN</button>
-                          </div>
-                        )}
+                        <div className="relative inline-block">
+                          <button
+                            onClick={() =>
+                              setActiveDropdown(
+                                activeDropdown === account._id ? null : account._id
+                              )
+                            }
+                            className={`px-3 py-1 rounded-full text-[11px] font-bold border flex items-center gap-1.5 ${isAdmin
+                                ? "bg-[#fff1f1] text-[#b31e23] border-red-100"
+                                : "bg-[#eaf4fb] text-[#264d6d] border-blue-100"
+                              }`}
+                          >
+                            {isAdmin ? <Shield size={12} /> : <User size={12} />}
+                            {account.role.toUpperCase()}
+                            <ChevronDown
+                              size={12}
+                              className={`transition-transform ${activeDropdown === account._id ? "rotate-180" : ""
+                                }`}
+                            />
+                          </button>
+
+                          {activeDropdown === account._id && (
+                            <div className="absolute left-0 top-full mt-1 w-28 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+                              <button
+                                onClick={() => handleChangeRole(account, "user")}
+                                className="w-full px-4 py-2 text-left text-xs hover:bg-gray-100"
+                              >
+                                USER
+                              </button>
+
+                              <button
+                                onClick={() => handleChangeRole(account, "admin")}
+                                className="w-full px-4 py-2 text-left text-xs hover:bg-gray-100"
+                              >
+                                ADMIN
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-400">{new Date(account.createdAt).toLocaleDateString("id-ID")}</td>
                       <td className="px-6 py-4 text-center">
