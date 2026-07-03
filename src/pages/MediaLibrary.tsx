@@ -5,7 +5,6 @@ import {
   Eye,
   Video,
   Clapperboard,
-  TrendingUp,
   ThumbsUp,
   ExternalLink,
   Search,
@@ -74,7 +73,7 @@ function MediaLibrary() {
   return (
     <AdminLayout>
       <div className="w-full p-6 flex flex-col gap-6">
-        
+
         {/* HEADER (Sama Persis dengan LearningContent) */}
         <div>
           <h1 className="text-2xl font-bold text-[#264d6d] tracking-tight">Perpustakaan Media</h1>
@@ -89,7 +88,7 @@ function MediaLibrary() {
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Video</p>
               <h2 className="text-2xl font-bold text-[#b31e23] mt-1">{videos.length} Baris</h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">Koleksi: `videos`</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Koleksi: Videos</p>
             </div>
             <div className="w-[52px] h-[52px] rounded-2xl bg-[#fff1f1] flex items-center justify-center text-[#b31e23]">
               <Clapperboard size={24} />
@@ -100,28 +99,17 @@ function MediaLibrary() {
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Top Channel</p>
               <h2 className="text-2xl font-bold text-[#264d6d] mt-1">{topChannels.length} Baris</h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">Koleksi: `top_channels`</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Koleksi: Top Channels`</p>
             </div>
             <div className="w-[52px] h-[52px] rounded-2xl bg-[#eaf4fb] flex items-center justify-center text-[#264d6d]">
               <Video size={24} />
-            </div>
-          </div>
-
-          <div className="bg-white p-5 border border-slate-100 rounded-3xl shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Matriks Channel</p>
-              <h2 className="text-2xl font-bold text-amber-600 mt-1">{channels.length} Baris</h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">Koleksi: `channels`</p>
-            </div>
-            <div className="w-[52px] h-[52px] rounded-2xl bg-[#fffbeb] flex items-center justify-center text-amber-600">
-              <TrendingUp size={24} />
             </div>
           </div>
         </div>
 
         {/* CONTAINER UTAMA BANNER */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-          
+
           {/* CONTROL BAR & TABS */}
           <div className="p-6 border-b border-slate-100 bg-white flex flex-col gap-5">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -147,27 +135,17 @@ function MediaLibrary() {
             <div className="flex gap-2 border-b border-slate-100 pb-px">
               <button
                 onClick={() => { setActiveTab("videos"); setSearchTerm(""); }}
-                className={`pb-2 px-4 text-xs font-bold transition-all border-b-2 ${
-                  activeTab === "videos" ? "border-[#264d6d] text-[#264d6d]" : "border-transparent text-slate-400 hover:text-slate-600"
-                }`}
+                className={`pb-2 px-4 text-xs font-bold transition-all border-b-2 ${activeTab === "videos" ? "border-[#264d6d] text-[#264d6d]" : "border-transparent text-slate-400 hover:text-slate-600"
+                  }`}
               >
                 Galeri Video ({videos.length})
               </button>
               <button
                 onClick={() => { setActiveTab("topChannels"); setSearchTerm(""); }}
-                className={`pb-2 px-4 text-xs font-bold transition-all border-b-2 ${
-                  activeTab === "topChannels" ? "border-[#264d6d] text-[#264d6d]" : "border-transparent text-slate-400 hover:text-slate-600"
-                }`}
+                className={`pb-2 px-4 text-xs font-bold transition-all border-b-2 ${activeTab === "topChannels" ? "border-[#264d6d] text-[#264d6d]" : "border-transparent text-slate-400 hover:text-slate-600"
+                  }`}
               >
                 Profil Channel ({topChannels.length})
-              </button>
-              <button
-                onClick={() => { setActiveTab("channels"); setSearchTerm(""); }}
-                className={`pb-2 px-4 text-xs font-bold transition-all border-b-2 ${
-                  activeTab === "channels" ? "border-[#264d6d] text-[#264d6d]" : "border-transparent text-slate-400 hover:text-slate-600"
-                }`}
-              >
-                Matriks Kontribusi ({channels.length})
               </button>
             </div>
           </div>
@@ -192,7 +170,7 @@ function MediaLibrary() {
                     {filteredItems.map((item, index) => {
                       const videoLink = item.video_url || item.videoUrl || item.url || "#";
                       const hasThumb = item.thumbnail || item.video_thumbnail;
-                      
+
                       return (
                         <div key={item._id || index} className="bg-white border border-[#eeeeee] rounded-3xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between group">
                           <div>
@@ -240,7 +218,7 @@ function MediaLibrary() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredItems.map((item, index) => {
                       const channelLink = item.channel_url || item.channelUrl || "#";
-                      
+
                       return (
                         <div key={item._id || index} className="bg-white border border-[#eeeeee] rounded-3xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between p-5 group">
                           <div className="flex items-start justify-between gap-4">
@@ -287,44 +265,6 @@ function MediaLibrary() {
                         </div>
                       );
                     })}
-                  </div>
-                )}
-
-                {/* TAB 3: CHANNELS MATRIKS */}
-                {activeTab === "channels" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredItems.map((item, index) => (
-                      <div key={item._id || index} className="bg-white border border-[#eeeeee] rounded-3xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 p-5 flex flex-col justify-between group">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-[#fffbeb] text-amber-600 flex items-center justify-center font-bold text-xs border border-[#fde68a] shadow-sm shrink-0">
-                              {getInitial(item)}
-                            </div>
-                            <h3 className="text-xs font-bold text-slate-700 line-clamp-1 group-hover:text-[#264d6d] transition-colors">
-                              {getChannelName(item)}
-                            </h3>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-md bg-[#f3e8ff] border border-purple-100 text-[#9333ea] font-bold text-[9px]">
-                            {Math.round(item.score || 0)} Pts
-                          </span>
-                        </div>
-
-                        <div className="border-t border-slate-100 mt-3.5 pt-3 flex flex-col gap-1.5 text-xs">
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-slate-400">Total Pelanggan:</span>
-                            <span className="font-bold text-slate-600">{(item.subscribers || 0).toLocaleString("id-ID")}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-slate-400">Jumlah Konten:</span>
-                            <span className="font-bold text-slate-600">{item.video_count || item.total_videos || 0} Video</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-slate-400">Akumulasi Views:</span>
-                            <span className="font-bold text-[#264d6d]">{(item.total_views || item.views || 0).toLocaleString("id-ID")}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 )}
               </>

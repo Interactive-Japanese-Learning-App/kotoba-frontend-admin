@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../layouts/AdminLayout";
-import { Users, Shield, BookOpen, Layers, Video, Tv } from "lucide-react";
+import { Users, Shield, BookOpen, Layers } from "lucide-react";
 import api from "../services/api";
 import {
   ResponsiveContainer,
@@ -304,8 +304,24 @@ function Dashboard() {
                   <XAxis dataKey="name" fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dy={10} />
                   <YAxis fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dx={-5} />
                   <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#0f172a', color: '#fff' }}
-                    itemStyle={{ color: '#38bdf8' }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "2px solid #4CAF50",
+                      backgroundColor: "#ffffff",
+                      color: "#EDBC1D",
+                    }}
+                    itemStyle={{
+                      color: "#4CAF50",
+                      fontWeight: 100,
+                    }}
+                    labelStyle={{
+                      color: "#4CAF50",
+                      fontWeight: 700,
+                    }}
+                    cursor={{
+                      stroke: "#4CAF50",
+                      strokeWidth: 2,
+                    }}
                   />
                   <Area type="monotone" dataKey="Pendaftar" stroke="#264d6d" fillOpacity={1} fill="url(#colorUser)" strokeWidth={3} name="Jumlah Pendaftar" animationDuration={1000}>
                     {/* Label nilai langsung pada ujung garis area chart */}
@@ -363,7 +379,7 @@ function Dashboard() {
                 Analisis Penggunaan Fitur
               </h2>
               <p className="text-[10px] text-slate-400 mt-1">
-                💡 Aktivitas pengguna berdasarkan fitur.
+                Aktivitas pengguna berdasarkan fitur.
               </p>
             </div>
 
@@ -456,13 +472,9 @@ function Dashboard() {
                   Video Trending
                 </h2>
                 <p className="text-[10px] text-slate-400 mt-0.5">
-                  💡 Top video berdasarkan performa (Views & Likes).
+                  Top video berdasarkan performa (Views & Likes).
                 </p>
               </div>
-
-              <span className="flex items-center gap-1 text-[9px] bg-transparent text-[#264d6d] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase">
-                <Video size={12} /> Big Data
-              </span>
             </div>
 
             <div className="h-72 w-full">
@@ -587,13 +599,9 @@ function Dashboard() {
                   Channel Trending
                 </h2>
                 <p className="text-[10px] text-slate-400 mt-0.5">
-                  💡 Klik salah satu bagian grafik untuk membuka channel YouTube.
+                  Klik salah satu bagian grafik untuk membuka channel YouTube.
                 </p>
               </div>
-
-              <span className="flex items-center gap-1 text-[9px] bg-transparent text-[#264D6D] px-2 py-0.5 rounded-md font-bold tracking-wider uppercase">
-                <Tv size={12} /> Big Data
-              </span>
             </div>
 
             <div className="h-80 w-full">

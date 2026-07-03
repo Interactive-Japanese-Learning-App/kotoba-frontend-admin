@@ -3,41 +3,18 @@ import {
   Users,
   BookOpen,
   Image,
-  LogOut,
-  User, // Tambahkan ini
 } from "lucide-react";
+
 import {
   Link,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
 
 import logo from "../assets/kotoba-logo.png";
 
 function Sidebar() {
-
   const location = useLocation();
 
-  const navigate = useNavigate();
-
-  //
-  // GET ADMIN LOGIN
-  //
-  const adminData =
-    localStorage.getItem("admin");
-
-  const admin = adminData
-    ? JSON.parse(adminData)
-    : null;
-
-  // username dari email
-  const username = admin?.email
-    ? admin.email.split("@")[0]
-    : "Administrator";
-
-  //
-  // MENU
-  //
   const menus = [
     {
       name: "Dashboard",
@@ -61,264 +38,111 @@ function Sidebar() {
     },
   ];
 
-  //
-  // HANDLE LOGOUT
-  //
-  const handleLogout = () => {
-
-    const confirmLogout =
-      window.confirm(
-        "Yakin ingin logout?"
-      );
-
-    if (!confirmLogout) return;
-
-    // hapus auth
-    localStorage.removeItem("token");
-
-    localStorage.removeItem("admin");
-
-    // redirect login
-    navigate("/");
-  };
-
   return (
-    <div
+    <aside
       className="
         w-[250px]
         min-w-[250px]
-        bg-white
-        border-r
-        border-[#e5e7eb]
         h-screen
         sticky
         top-0
+        bg-white
+        border-r
+        border-slate-200
         flex
         flex-col
-        justify-between
       "
     >
+      {/* LOGO */}
+      <div className="px-6 pt-6 pb-8">
+        <div className="flex items-center gap-3">
+          <img
+            src={logo}
+            alt="Kotoba Logo"
+            className="w-[42px]"
+          />
 
-      {/* TOP */}
-      <div>
+          <div>
+            <h1 className="text-[24px] font-extrabold tracking-wide text-[#123b5d]">
+              KOTOBA
+            </h1>
 
-        {/* LOGO */}
-        <div className="px-6 pt-6 pb-8">
-
-          <div className="flex items-center gap-3">
-
-            <img
-              src={logo}
-              alt="Kotoba Logo"
-              className="w-[42px]"
-            />
-
-            <div>
-
-              <h1
-                className="
-                  text-[24px]
-                  font-extrabold
-                  text-[#123b5d]
-                  tracking-wide
-                "
-              >
-                KOTOBA
-              </h1>
-
-              <p
-                className="
-                  text-[12px]
-                  text-gray-400
-                  -mt-1
-                "
-              >
-                Admin Console
-              </p>
-
-            </div>
-
+            <p className="text-[12px] text-gray-400 -mt-1">
+              Admin Console
+            </p>
           </div>
-
         </div>
+      </div>
 
-        {/* MENU */}
-        <div className="flex flex-col gap-2 px-4">
+      {/* MENU */}
+      <nav className="flex flex-col gap-2 px-4">
+        {menus.map((menu) => {
+          const active = location.pathname === menu.path;
 
-          {menus.map((menu) => {
-
-            const active =
-              location.pathname === menu.path;
-
-            return (
-
-              <Link
-                key={menu.name}
-                to={menu.path}
+          return (
+            <Link
+              key={menu.name}
+              to={menu.path}
+            >
+              <button
+                className={`
+                  relative
+                  w-full
+                  h-[48px]
+                  flex
+                  items-center
+                  gap-3
+                  px-4
+                  rounded-2xl
+                  text-[14px]
+                  transition-all
+                  duration-200
+                  ${
+                    active
+                      ? "bg-[#eef3f7] text-[#123b5d] font-semibold"
+                      : "text-gray-600 hover:bg-[#f8fafc]"
+                  }
+                `}
               >
+                {active && (
+                  <div
+                    className="
+                      absolute
+                      left-0
+                      top-[8px]
+                      w-[4px]
+                      h-[32px]
+                      bg-[#123b5d]
+                      rounded-r-full
+                    "
+                  />
+                )}
 
-                <button
+                <div
                   className={`
-                    relative
-                    w-full
-                    h-[48px]
+                    w-8
+                    h-8
+                    rounded-xl
                     flex
                     items-center
-                    gap-3
-                    px-4
-                    rounded-2xl
-                    text-[14px]
-                    transition-all
-                    duration-200
+                    justify-center
                     ${
                       active
-                        ? "bg-[#eef3f7] text-[#123b5d] font-semibold"
-                        : "text-gray-600 hover:bg-[#f8fafc]"
+                        ? "bg-white text-[#123b5d]"
+                        : "bg-[#f8fafc] text-gray-500"
                     }
                   `}
                 >
+                  {menu.icon}
+                </div>
 
-                  {/* ACTIVE LINE */}
-                  {active && (
-
-                    <div
-                      className="
-                        absolute
-                        left-0
-                        top-[8px]
-                        w-[4px]
-                        h-[32px]
-                        bg-[#123b5d]
-                        rounded-r-full
-                      "
-                    />
-
-                  )}
-
-                  {/* ICON */}
-                  <div
-                    className={`
-                      w-8
-                      h-8
-                      rounded-xl
-                      flex
-                      items-center
-                      justify-center
-                      ${
-                        active
-                          ? "bg-white text-[#123b5d]"
-                          : "bg-[#f8fafc] text-gray-500"
-                      }
-                    `}
-                  >
-                    {menu.icon}
-                  </div>
-
-                  {/* TEXT */}
-                  <span>{menu.name}</span>
-
-                </button>
-
-              </Link>
-
-            );
-          })}
-
-        </div>
-
-      </div>
-
-      {/* BOTTOM */}
-      <div className="p-4 flex flex-col gap-3">
-
-        {/* PROFILE */}
-        <div
-          className="
-            bg-[#f8fafc]
-            rounded-2xl
-            p-3
-            flex
-            items-center
-            gap-3
-            border
-            border-[#eeeeee]
-            align-middle
-          "
-        >
-{/* AVATAR */}
-<div
-  className="
-    w-11
-    h-11
-    min-w-[44px]   // Tambahkan ini untuk mencegah container menyusut
-    min-h-[44px]   // Tambahkan ini untuk mencegah container menyusut
-    rounded-full
-    bg-[#123b5d]
-    text-white
-    flex
-    items-center
-    justify-center
-    font-bold
-    text-[18px]
-    overflow-hidden // Pastikan ikon tidak keluar dari batas lingkaran
-  "
->
-  <User size={22} className="flex-shrink-0" /> {/* Tambahkan flex-shrink-0 */}
-</div>
-          {/* INFO - Gunakan class ini */}
-<div className="flex-1 min-w-0"> {/* min-w-0 sangat penting agar teks bisa di-truncate dengan benar */}
-  <h2
-    className="
-      text-[13px]
-      font-bold
-      text-slate-800
-      truncate
-      leading-tight
-    "
-  >
-    {username.toLowerCase()}
-  </h2>
-
-  <p
-    className="
-      text-[11px]
-      text-slate-500
-      truncate
-      leading-tight
-    "
-  >
-    {(admin?.email || "-").toLowerCase()}
-  </p>
-</div>        </div>
-
-        {/* LOGOUT */}
-        <button
-          onClick={handleLogout}
-          className="
-            h-[48px]
-            flex
-            items-center
-            justify-center
-            gap-2
-            rounded-2xl
-            bg-[#fff1f1]
-            text-[#b31e23]
-            text-[14px]
-            font-semibold
-            hover:bg-[#ffe5e5]
-            transition-all
-          "
-        >
-
-          <LogOut size={17} />
-
-          Logout
-
-        </button>
-
-      </div>
-
-    </div>
+                <span>{menu.name}</span>
+              </button>
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
   );
 }
 
