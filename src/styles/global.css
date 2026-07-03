@@ -167,3 +167,9 @@ body {
   font-size: var(--text-sm);
   color: #9ca3af;
 }
+
+.calendar-blue::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(24%) sepia(31%) saturate(1314%) hue-rotate(169deg)
+          brightness(90%) contrast(95%);
+}

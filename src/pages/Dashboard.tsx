@@ -9,17 +9,14 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
   AreaChart,
   Area,
   LabelList,
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 
 function Dashboard() {
@@ -32,7 +29,8 @@ function Dashboard() {
 
   type GrowthPoint = { name: string; Pendaftar: number };
   type YtVideoPoint = { title: string; Views: number; Likes: number };
-  type YtChannelPoint = { channelName: string; TotalViews: number; TotalVideo: number };
+  type YtChannelPoint = { channelName: string; TotalViews: number; TotalVideo: number; channelUrl: string };
+  type FeatureUsagePoint = { activityType: string; total: number };
 
   const [stats, setStats] = useState<{
     totalAccounts: number;
@@ -55,9 +53,12 @@ function Dashboard() {
     ytVideosData: [],
     ytChannelsData: []
   });
-  const [loading, setLoading] = useState(true);
 
-  // State Kontrol Interaktif untuk legenda klik
+  const [loading, setLoading] = useState(true);
+  const today = new Date().toISOString().split("T")[0];
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [featureUsageData, setFeatureUsageData] = useState<FeatureUsagePoint[]>([]);
+  const [userGrowthData, setUserGrowthData] = useState<GrowthPoint[]>([]);
   const [showViews, setShowViews] = useState(true);
   const [showLikes, setShowLikes] = useState(true);
 
@@ -95,9 +96,15 @@ function Dashboard() {
       }));
 
       const ytChannelsData = (ytData.topChannels || []).slice(0, 5).map((c: any) => ({
-        channelName: c.channel_name.length > 12 ? c.channel_name.substring(0, 12) + "..." : c.channel_name,
-        "TotalViews": c.total_views || 0,
-        "TotalVideo": c.total_videos || 0
+        channelName:
+          c.channel_name.length > 12
+            ? c.channel_name.substring(0, 12) + "..."
+            : c.channel_name,
+
+        TotalViews: c.total_views || 0,
+        TotalVideo: c.total_videos || 0,
+
+        channelUrl: c.channel_url || "",
       }));
 
       const totalAdmins = accounts.filter((a: any) => a.role === "admin").length;
@@ -131,7 +138,78 @@ function Dashboard() {
     }
   };
 
-  useEffect(() => { fetchDashboardData(); }, []);
+  const fetchFeatureUsage = async (date: string) => {
+    try {
+      const res = await api.get(
+        `/activity/statistics?date=${date}`
+      );
+
+      const defaultData = [
+        { activityType: "Nihongo Dasar", total: 0 },
+        { activityType: "Deteksi Objek", total: 0 },
+        { activityType: "Kanvas Menulis", total: 0 },
+        { activityType: "Pelafalan Suara", total: 0 },
+        { activityType: "Kuis", total: 0 },
+      ];
+
+      const colors: Record<string, string> = {
+        learning: "Nihongo Dasar",
+        object_detection: "Deteksi Objek",
+        kana_writing: "Kanvas Menulis",
+        pronunciation: "Pelafalan Suara",
+        quiz: "Kuis",
+      };
+
+      const formatted = defaultData.map((feature) => {
+        const found = res.data.data.find(
+          (item: any) =>
+            colors[item.activityType] === feature.activityType
+        );
+
+        return {
+          activityType: feature.activityType,
+          total: found ? found.total : 0,
+        };
+      });
+
+      setFeatureUsageData(formatted);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchUserGrowth = async (date: string) => {
+    try {
+      const res = await api.get(`/account/user-growth?date=${date}`);
+
+      setUserGrowthData(res.data.data);
+    } catch (err) {
+      console.error(err);
+
+      setUserGrowthData([
+        { name: "Sen", Pendaftar: 0 },
+        { name: "Sel", Pendaftar: 0 },
+        { name: "Rab", Pendaftar: 0 },
+        { name: "Kam", Pendaftar: 0 },
+        { name: "Jum", Pendaftar: 0 },
+        { name: "Sab", Pendaftar: 0 },
+        { name: "Min", Pendaftar: 0 },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    fetchFeatureUsage(selectedDate);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchUserGrowth(selectedDate);
+  }, [selectedDate]);
 
   const formatYAxis = (value: number | string) => {
     const tick = typeof value === "number" ? value : Number(value);
@@ -197,12 +275,31 @@ function Dashboard() {
 
         {/* BARIS 1: USER PENGGUNA (AREA CHART + LOG AKTIVITAS) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* GRAFIK 1: AREA AKUISISI USER */}
+          {/* AREA AKUISISI USER */}
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-6">Grafik 1: Retensi & Akuisisi Pengguna Baru</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-6">Retensi & Akuisisi Pengguna Baru</h2>
+            <div className="flex justify-end mb-4">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="
+                  border border-[#264D6D]
+                  rounded-lg
+                  px-3 py-2
+                  text-xs
+                  text-[#264D6D]
+                  bg-[#eaf4fb]
+                  font-medium
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-[#264D6D]
+                "
+              />
+            </div>
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={stats.userGrowthData} margin={{ top: 15, right: 15, left: 10, bottom: 10 }}>
+                <AreaChart data={userGrowthData} margin={{ top: 35, right: 15, left: 10, bottom: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="name" fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dy={10} />
                   <YAxis fontSize={11} fontWeight={500} tickLine={false} axisLine={false} stroke="#64748b" dx={-5} />
@@ -258,6 +355,96 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* BARIS 3 : FEATURE USAGE */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Analisis Penggunaan Fitur
+              </h2>
+              <p className="text-[10px] text-slate-400 mt-1">
+                💡 Aktivitas pengguna berdasarkan fitur.
+              </p>
+            </div>
+
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="
+                border border-[#264D6D]
+                rounded-lg
+                px-3 py-2
+                text-xs
+                text-[#264D6D]
+                font-medium
+                bg-[#eaf4fb]
+                focus:outline-none
+                focus:ring-2
+                focus:ring-[#264D6D]
+                focus:border-[#264D6D]
+                cursor-pointer
+                calendar-blue
+              "
+            />
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={featureUsageData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 10,
+                  bottom: 10
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="activityType"
+                  tick={{ fontSize: 11 }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tickCount={6}
+                />
+                <Tooltip
+                  formatter={(value) => [
+                    Number(value).toLocaleString("id-ID"),
+                    "Jumlah Aktivitas",
+                  ]}
+                />
+                <Bar
+                  dataKey="total"
+                  radius={[8, 8, 0, 0]}
+                >
+                  {featureUsageData.map((_, index) => (
+                    <Cell
+                      key={index}
+                      fill={[
+                        "#264D6D",
+                        "#B31E23",
+                        "#EDBC1D",
+                        "#4CAF50",
+                        "#686868",
+                      ][index % 5]}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="total"
+                    position="top"
+                    fontSize={11}
+                    fontWeight={700}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
         {/* BARIS 2: YOUTUBE BIG DATA (2 KOLOM JELAS & PRESISI DATA) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -266,7 +453,7 @@ function Dashboard() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Big Data - Video
+                  Video Trending
                 </h2>
                 <p className="text-[10px] text-slate-400 mt-0.5">
                   💡 Top video berdasarkan performa (Views & Likes).
@@ -400,7 +587,7 @@ function Dashboard() {
                   Channel Trending
                 </h2>
                 <p className="text-[10px] text-slate-400 mt-0.5">
-                  💡 Persentase total views berdasarkan channel.
+                  💡 Klik salah satu bagian grafik untuk membuka channel YouTube.
                 </p>
               </div>
 
@@ -423,16 +610,22 @@ function Dashboard() {
                     paddingAngle={2}
                     stroke="#ffffff"
                     strokeWidth={2}
+                    style={{ cursor: "pointer" }}
+                    onClick={(data: any) => {
+                      if (data.channelUrl) {
+                        window.open(data.channelUrl, "_blank", "noopener,noreferrer");
+                      }
+                    }}
                   >
                     {stats.ytChannelsData.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={[
-                          "#264D6D", // Biru
-                          "#B31E23", // Merah
-                          "#EDBC1D", // Kuning
-                          "#4CAF50", // Hijau
-                          "#686868", // Abu
+                          "#264D6D",
+                          "#B31E23",
+                          "#EDBC1D",
+                          "#4CAF50",
+                          "#686868",
                         ][index % 5]}
                       />
                     ))}
