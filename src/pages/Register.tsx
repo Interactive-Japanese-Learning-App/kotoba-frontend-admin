@@ -13,6 +13,7 @@ function Register() {
 
   const navigate = useNavigate();
 
+
   //
   // FORM
   //
@@ -26,6 +27,8 @@ function Register() {
     confirmPassword,
     setConfirmPassword,
   ] = useState("");
+
+
 
   //
   // UI
@@ -41,12 +44,15 @@ function Register() {
   const [loading, setLoading] =
     useState(false);
 
+
+
   //
   // HANDLE REGISTER
   //
   const handleRegister = async () => {
 
     try {
+
 
       //
       // VALIDATION
@@ -56,11 +62,16 @@ function Register() {
         !password ||
         !confirmPassword
       ) {
-        alert(
+
+        console.log(
           "Semua field wajib diisi"
         );
+
         return;
+
       }
+
+
 
       //
       // PASSWORD MATCH
@@ -68,13 +79,20 @@ function Register() {
       if (
         password !== confirmPassword
       ) {
-        alert(
+
+        console.log(
           "Password tidak sama"
         );
+
         return;
+
       }
 
+
+
       setLoading(true);
+
+
 
       //
       // API REQUEST
@@ -88,32 +106,36 @@ function Register() {
         }
       );
 
-      alert(
-        "Register berhasil"
-      );
+
 
       //
-      // REDIRECT LOGIN
+      // LANGSUNG KE LOGIN
       //
       navigate("/");
 
+
+
     } catch (error: any) {
+
 
       console.log(error);
 
-      alert(
-        error.response?.data?.message ||
-        "Register gagal"
-      );
+
 
     } finally {
 
+
       setLoading(false);
 
+
     }
+
   };
 
+
+
   return (
+
     <div
       className="
         min-h-screen
@@ -126,14 +148,25 @@ function Register() {
       "
     >
 
+
+
       {/* LOGO */}
-      <div className="flex flex-col items-center mb-6">
+
+      <div
+        className="
+          flex
+          flex-col
+          items-center
+          mb-6
+        "
+      >
 
         <img
           src={logo}
           alt="KOTOBA Logo"
           className="w-[90px]"
         />
+
 
         <h1
           className="
@@ -147,21 +180,42 @@ function Register() {
           KOTOBA
         </h1>
 
+
       </div>
 
+
+
+
+
       {/* CARD */}
+
       <AuthCard>
 
-        <div className="flex flex-col gap-4">
+
+        <div
+          className="
+            flex
+            flex-col
+            gap-4
+          "
+        >
+
+
 
           {/* EMAIL */}
+
           <input
+
             type="email"
+
             placeholder="Email"
+
             value={email}
+
             onChange={(e) =>
               setEmail(e.target.value)
             }
+
             className="
               h-[52px]
               rounded-[8px]
@@ -173,22 +227,35 @@ function Register() {
               outline-none
               focus:border-[#264d6d]
             "
+
           />
 
+
+
+
+
           {/* PASSWORD */}
+
           <div className="relative">
 
+
             <input
+
               type={
                 showPassword
                   ? "text"
                   : "password"
               }
+
               placeholder="Kata Sandi"
+
               value={password}
+
               onChange={(e) =>
                 setPassword(e.target.value)
               }
+
+
               className="
                 w-full
                 h-[52px]
@@ -202,15 +269,22 @@ function Register() {
                 outline-none
                 focus:border-[#264d6d]
               "
+
             />
 
+
+
             <button
+
               type="button"
+
               onClick={() =>
                 setShowPassword(
                   !showPassword
                 )
               }
+
+
               className="
                 absolute
                 right-4
@@ -218,32 +292,56 @@ function Register() {
                 -translate-y-1/2
                 text-[#6f8aa5]
               "
+
             >
-              {showPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
+
+
+              {
+                showPassword
+                ?
+                <EyeOff size={20}/>
+                :
+                <Eye size={20}/>
+              }
+
+
             </button>
+
 
           </div>
 
+
+
+
+
+
           {/* CONFIRM PASSWORD */}
+
           <div className="relative">
 
+
             <input
+
               type={
                 showConfirmPassword
                   ? "text"
                   : "password"
               }
+
+
               placeholder="Konfirmasi Kata Sandi"
+
+
               value={confirmPassword}
+
+
               onChange={(e) =>
                 setConfirmPassword(
                   e.target.value
                 )
               }
+
+
               className="
                 w-full
                 h-[52px]
@@ -257,15 +355,24 @@ function Register() {
                 outline-none
                 focus:border-[#264d6d]
               "
+
+
             />
 
+
+
+
             <button
+
               type="button"
+
               onClick={() =>
                 setShowConfirmPassword(
                   !showConfirmPassword
                 )
               }
+
+
               className="
                 absolute
                 right-4
@@ -273,50 +380,96 @@ function Register() {
                 -translate-y-1/2
                 text-[#6f8aa5]
               "
+
+
             >
-              {showConfirmPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
+
+
+              {
+                showConfirmPassword
+                ?
+                <EyeOff size={20}/>
+                :
+                <Eye size={20}/>
+              }
+
+
             </button>
+
+
 
           </div>
 
+
+
+
+
+
           {/* BUTTON */}
+
           <AuthButton
+
             text={
               loading
-                ? "Loading..."
-                : "Daftar"
+              ? "Loading..."
+              : "Daftar"
             }
+
             onClick={handleRegister}
+
           />
+
+
 
         </div>
 
+
       </AuthCard>
 
+
+
+
+
       {/* BOTTOM */}
-      <p className="mt-5 text-[#666] text-[14px]">
+
+      <p
+        className="
+          mt-5
+          text-[#666]
+          text-[14px]
+        "
+      >
 
         Sudah punya akun?
 
+
         <Link
+
           to="/"
+
           className="
             text-[#b31e23]
             font-semibold
             ml-1
           "
+
         >
+
           Masuk
+
         </Link>
+
 
       </p>
 
+
+
+
     </div>
+
   );
+
 }
+
 
 export default Register;

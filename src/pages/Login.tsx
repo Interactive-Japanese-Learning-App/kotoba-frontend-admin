@@ -25,6 +25,7 @@ function Login() {
   const [loading, setLoading] =
     useState(false);
 
+
   //
   // HANDLE LOGIN
   //
@@ -33,13 +34,14 @@ function Login() {
     try {
 
       if (!email || !password) {
-        alert(
+        console.log(
           "Email dan password wajib diisi"
         );
         return;
       }
 
       setLoading(true);
+
 
       const response = await api.post(
         "/auth/admin/login",
@@ -49,6 +51,7 @@ function Login() {
         }
       );
 
+
       //
       // SAVE TOKEN
       //
@@ -57,6 +60,7 @@ function Login() {
         response.data.token
       );
 
+
       localStorage.setItem(
         "admin",
         JSON.stringify(
@@ -64,25 +68,25 @@ function Login() {
         )
       );
 
-      alert("Login berhasil");
 
+      //
+      // LANGSUNG MASUK DASHBOARD
+      //
       navigate("/dashboard");
+
 
     } catch (error: any) {
 
       console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Login gagal"
-      );
 
     } finally {
 
       setLoading(false);
 
     }
+
   };
+
 
   return (
     <div
@@ -96,6 +100,7 @@ function Login() {
         px-4
       "
     >
+
 
       {/* LOGO */}
       <div className="flex flex-col items-center mb-6">
@@ -120,10 +125,13 @@ function Login() {
 
       </div>
 
+
+
       {/* CARD */}
       <AuthCard>
 
         <div className="flex flex-col gap-4">
+
 
           {/* EMAIL */}
           <input
@@ -145,6 +153,8 @@ function Login() {
               focus:border-[#264d6d]
             "
           />
+
+
 
           {/* PASSWORD */}
           <div className="relative">
@@ -175,6 +185,7 @@ function Login() {
               "
             />
 
+
             <button
               type="button"
               onClick={() =>
@@ -190,14 +201,19 @@ function Login() {
                 text-[#6f8aa5]
               "
             >
+
               {showPassword ? (
                 <EyeOff size={20} />
               ) : (
                 <Eye size={20} />
               )}
+
             </button>
 
           </div>
+
+
+
 
           {/* BUTTON */}
           <AuthButton
@@ -209,14 +225,19 @@ function Login() {
             onClick={handleLogin}
           />
 
+
         </div>
 
       </AuthCard>
+
+
+
 
       {/* BOTTOM */}
       <p className="mt-5 text-[#666] text-[14px]">
 
         Belum punya akun?
+
 
         <Link
           to="/register"
@@ -229,10 +250,13 @@ function Login() {
           Daftar
         </Link>
 
+
       </p>
+
 
     </div>
   );
 }
+
 
 export default Login;
